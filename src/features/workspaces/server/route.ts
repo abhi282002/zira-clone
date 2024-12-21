@@ -6,7 +6,7 @@ import { DATABASE_ID, IMAGES_BUCKET_ID, WORKSPACES_ID } from "@/config";
 import { ID } from "node-appwrite";
 const app = new Hono().post(
   "/",
-  zValidator("json", createWorkspaceSchema),
+  zValidator("form", createWorkspaceSchema),
   sessionMiddleware,
   async (c) => {
     const databases = c.get("databases");
@@ -14,7 +14,7 @@ const app = new Hono().post(
 
     const user = c.get("user");
 
-    const { name, image } = c.req.valid("json");
+    const { name, image } = c.req.valid("form");
 
     let uploadedImageUrl: string | undefined;
 
@@ -42,7 +42,7 @@ const app = new Hono().post(
       {
         name,
         userId: user.$id,
-        image: uploadedImageUrl,
+        imageUrl: uploadedImageUrl,
       }
     );
     return c.json({ data: workspace });
