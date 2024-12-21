@@ -52,7 +52,15 @@ export const CreateWorkspacesForm = ({
       ...values,
       image: values.image instanceof File ? values.image : "",
     };
-    mutate({ form: finalValues });
+    mutate(
+      { form: finalValues },
+      {
+        onSuccess: () => {
+          form.reset();
+          //TODO: Add Ridrect to workspace page
+        },
+      }
+    );
   };
 
   return (
@@ -110,7 +118,7 @@ export const CreateWorkspacesForm = ({
                       )}
                       <div className="flex flex-col">
                         <p className="text-sm">Workspace Icon</p>
-                        <p>JPG, PNG, SVG or JPEG, max 1mb</p>
+                        <p>JPG, PNG, SVG or JPEG Max 1MB</p>
                         <input
                           className="hidden"
                           type="file"
