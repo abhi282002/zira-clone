@@ -21,6 +21,8 @@ import { useCreateWorkspace } from "../api/use-create-workspace";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ImageIcon } from "lucide-react";
 import React, { useRef } from "react";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface CreateWorkspacesFormProps {
   onCancel?: () => void;
@@ -29,6 +31,8 @@ interface CreateWorkspacesFormProps {
 export const CreateWorkspacesForm = ({
   onCancel,
 }: CreateWorkspacesFormProps) => {
+  const router = useRouter();
+
   const { mutate, isPending } = useCreateWorkspace();
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -55,9 +59,9 @@ export const CreateWorkspacesForm = ({
     mutate(
       { form: finalValues },
       {
-        onSuccess: () => {
+        onSuccess: ({ data }) => {
           form.reset();
-          //TODO: Add Ridrect to workspace page
+          router.push(`/workspaces/${data.$id}`);
         },
       }
     );
@@ -151,6 +155,7 @@ export const CreateWorkspacesForm = ({
                 variant={"secondary"}
                 onClick={onCancel}
                 disabled={isPending}
+                className={cn(!onCancel && "invisible")}
               >
                 Cancel
               </Button>

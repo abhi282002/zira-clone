@@ -1,37 +1,37 @@
-'use client';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { FcGoogle } from 'react-icons/fc';
-import { FaGithub } from 'react-icons/fa';
-import { DottedSeparator } from '@/components/dotted-separator';
-import { Button } from '@/components/ui/button';
+"use client";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
+import { DottedSeparator } from "@/components/dotted-separator";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import Link from 'next/link';
-import { useForm } from 'react-hook-form';
-import { registerSchema } from '../schemas';
-import { useRegister } from '../api/use-register';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { registerSchema } from "../schemas";
+import { useRegister } from "../api/use-register";
 
 export const SignUpCard = () => {
   const { mutate, isPending } = useRegister();
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
@@ -44,12 +44,12 @@ export const SignUpCard = () => {
       <CardHeader className="flex items-center justify-center text-center p-7">
         <CardTitle className="text-2xl">Sign Up</CardTitle>
         <CardDescription>
-          By signinup, you agree to our terms{' '}
-          <Link href={'/privacy'}>
+          By signinup, you agree to our terms{" "}
+          <Link href={"/privacy"}>
             <span className="text-blue-700">Privacy Policy</span>
-          </Link>{' '}
-          and{''}
-          <Link href={'/terms'}>
+          </Link>{" "}
+          and{""}
+          <Link href={"/terms"}>
             <span className="text-blue-700">Terms of Service</span>
           </Link>
         </CardDescription>
@@ -108,7 +108,7 @@ export const SignUpCard = () => {
                 </FormItem>
               )}
             />
-            <Button disabled={isPending} className="w-full" size={'lg'}>
+            <Button disabled={isPending} className="w-full" size={"lg"}>
               Login
             </Button>
           </form>
@@ -119,18 +119,18 @@ export const SignUpCard = () => {
       </div>
       <CardContent className="p-7 flex flex-col gap-y-4">
         <Button
-          variant={'secondary'}
+          variant={"secondary"}
           disabled={isPending}
-          size={'lg'}
+          size={"lg"}
           className="w-full"
         >
           <FcGoogle className="mr-2 size-5" />
           Login with Google
         </Button>
         <Button
-          variant={'secondary'}
+          variant={"secondary"}
           disabled={isPending}
-          size={'lg'}
+          size={"lg"}
           className="w-full"
         >
           <FaGithub className="mr-2 size-5" />
@@ -143,7 +143,7 @@ export const SignUpCard = () => {
       <CardContent className="p-7 flex items-center justify-center">
         <p>
           Already have an account ?
-          <Link href={'/sign-in'}>
+          <Link href={"/sign-in"}>
             <span className="text-blue-700"> Sign In</span>
           </Link>
         </p>
