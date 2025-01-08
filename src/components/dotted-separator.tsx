@@ -1,3 +1,4 @@
+import React from "react"
 import { cn } from '@/lib/utils';
 
 interface DottedSeparatorProps {
@@ -8,6 +9,8 @@ interface DottedSeparatorProps {
   gapSize?: string;
   direction?: 'horizontal' | 'vertical';
 }
+
+
 
 export const DottedSeparator = ({
   className,

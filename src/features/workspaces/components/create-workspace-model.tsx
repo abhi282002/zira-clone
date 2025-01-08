@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 import { ResponsiveModel } from "@/components/ui/responsive-model";
 
 import { CreateWorkspacesForm } from "./create-workspaces-form";

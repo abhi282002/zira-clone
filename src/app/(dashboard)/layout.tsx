@@ -1,6 +1,9 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { Navbar } from "@/components/navbar";
 import { Sidebar } from "@/components/sidebar";
 import { CreateWorkspacesModel } from "@/features/workspaces/components/create-workspace-model";
+
+
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

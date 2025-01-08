@@ -3,7 +3,7 @@ import Image from "next/image";
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { createWorkspaceSchema } from "../schemas";
+import { updateWorkspaceSchema } from "../schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DottedSeparator } from "@/components/dotted-separator";
@@ -17,32 +17,47 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useCreateWorkspace } from "../api/use-create-workspace";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ImageIcon } from "lucide-react";
+import { ArrowLeftIcon, ImageIcon } from "lucide-react";
 import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Workspace } from "../types";
+import { useUpdateWorkspace } from "../api/use-update-workspace";
+import { useConfirm } from "@/hooks/use-confirm";
+import { useDeleteWorkspace } from "../api/use-delete-workspace";
 
-interface CreateWorkspacesFormProps {
+interface EditWorkspaceFormProps{
   onCancel?: () => void;
+  initialValues: Workspace
 }
 
-export const CreateWorkspacesForm = ({
-  onCancel,
-}: CreateWorkspacesFormProps) => {
-  const router = useRouter();
 
-  const { mutate, isPending } = useCreateWorkspace();
+export const EditWorkSpaceForm = ({
+  onCancel,
+  initialValues
+}: EditWorkspaceFormProps) => {
+  const router = useRouter();
+  const { mutate, isPending } = useUpdateWorkspace();
+
+  const {mutate:deleteWorkspace,isPending:isDeletingWorkspace} = useDeleteWorkspace();
+
+  const [DeleteDialog,confirmDelete] = useConfirm(
+   "Delete Workspace",
+   "This action cannot be undone",
+   "destructive" 
+  )
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm<z.infer<typeof createWorkspaceSchema>>({
-    resolver: zodResolver(createWorkspaceSchema),
+  const form = useForm<z.infer<typeof updateWorkspaceSchema>>({
+    resolver: zodResolver(updateWorkspaceSchema),
     defaultValues: {
-      name: "",
+      ...initialValues,
+      image:initialValues.imageUrl ?? "", 
     },
   });
+
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,13 +66,17 @@ export const CreateWorkspacesForm = ({
     }
   };
 
-  const onSubmit = (values: z.infer<typeof createWorkspaceSchema>) => {
+  const onSubmit = (values: z.infer<typeof updateWorkspaceSchema>) => {
     const finalValues = {
       ...values,
       image: values.image instanceof File ? values.image : "",
     };
     mutate(
-      { form: finalValues },
+      { form: finalValues, 
+        param:{
+          workspaceId:initialValues.$id
+        }
+      },
       {
         onSuccess: ({ data }) => {
           form.reset();
@@ -67,11 +86,35 @@ export const CreateWorkspacesForm = ({
     );
   };
 
+  const handleDelete = async () =>{
+    const ok = await confirmDelete();
+
+    if(!ok){
+      return;
+    }
+
+    deleteWorkspace({
+      param:{
+        workspaceId:initialValues.$id
+      }
+    },{
+      onSuccess:()=>{
+        window.location.href = "/";
+      }
+    })
+
+  }
+
   return (
+    <div className="flex flex-col gap-y-4">
+      <DeleteDialog />
     <Card className="w-full h-full border-none shadow-none">
-      <CardHeader className="flex p-7">
+      <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
+        <Button size="sm" onClick={onCancel?onCancel:()=>router.push(`/workspaces/${initialValues.$id}`)} variant="secondary">Back
+        <ArrowLeftIcon className="size-4 mr-2" />
+        </Button>
         <CardTitle className="text-xl font-bold">
-          Create a new workspace
+          {initialValues.name}
         </CardTitle>
       </CardHeader>
       <div className="px-7">
@@ -131,25 +174,7 @@ export const CreateWorkspacesForm = ({
                           onChange={handleImageChange}
                           disabled={isPending}
                         />
-                        {field.value?
-                       <Button
-                          type="button"
-                          disabled={isPending}
-                          variant={"destructive"}
-                          size={"xs"}
-                          className="w-fit mt-2"
-                          onClick={()=>{
-                            field.onChange(null);
-                            if(inputRef.current){
-                              inputRef.current.value="";
-                            }
-                          }}
-                        >
-                          Remove Image
-                        </Button> 
-                        
-                        :
-                          <Button
+                        <Button
                           type="button"
                           disabled={isPending}
                           variant={"teritary"}
@@ -158,8 +183,7 @@ export const CreateWorkspacesForm = ({
                           onClick={() => inputRef.current?.click()}
                         >
                           Upload Image
-                          </Button> 
-                        }
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -179,12 +203,25 @@ export const CreateWorkspacesForm = ({
                 Cancel
               </Button>
               <Button type="submit" size={"lg"} disabled={isPending}>
-                Create
+                Save Changes
               </Button>
             </div>
           </form>
         </Form>
       </CardContent>
     </Card>
+    <Card className="w-full h-full border-none shadow-none">
+      <CardContent className="p-7">
+        <div className="flex flex-col">
+          <h3 className="font-bold">Danger Zone</h3>
+          <p className="text-sm text-muted-foreground">
+            Deleting a workspace is a irreversible action. Once a workspace is
+            deleted, it cannot be recovered.
+          </p>
+          <Button className="mt-6 w-fit ml-auto" size={"sm"} variant={"destructive"} type="button" disabled={isPending || isDeletingWorkspace} onClick={handleDelete}>Delete Workspace</Button>
+        </div>
+      </CardContent>
+    </Card>
+    </div>
   );
 };
